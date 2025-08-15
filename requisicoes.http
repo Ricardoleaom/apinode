@@ -1,0 +1,14 @@
+POST http://localhost:3333/courses
+Content-Type: application/json
+
+{
+    "title": "Curso de Docker"
+}
+
+###
+
+GET http://localhost:333/courses
+
+###
+
+GET http://localhost:3333/courses/80669304-a950-4c75-a58b-3e147455030c

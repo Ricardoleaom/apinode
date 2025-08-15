@@ -1,0 +1,28 @@
+{
+  "name": "apinode",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "dev": "node --watch server.ts"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Ricardoleaom/apinode.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Ricardoleaom/apinode/issues"
+  },
+  "homepage": "https://github.com/Ricardoleaom/apinode#readme",
+  "devDependencies": {
+    "@types/node": "^24.3.0",
+    "typescript": "^5.9.2"
+  },
+  "dependencies": {
+    "fastify": "^5.5.0",
+    "pino-pretty": "^13.1.1"
+  }
+}
