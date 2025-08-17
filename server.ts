@@ -1,6 +1,10 @@
 import fastify from "fastify";
-import crypto from "node:crypto";
-import { request } from "node:http";
+import { validatorCompiler, serializerCompiler, type ZodTypeProvider, jsonSchemaTransform } from "fastify-type-provider-zod";
+import { fastifySwagger } from "@fastify/swagger";
+import { createCoursesRoute } from "./src/routes/create-courses.ts";
+import { getCoursesRoute } from "./src/routes/get-courses.ts";
+import { getCoursesByIdRoute } from "./src/routes/get-courses-by-id.ts";
+import scalarAPIReference from "@scalar/fastify-api-reference";
 
 const server = fastify({
   logger: {
@@ -12,53 +16,42 @@ const server = fastify({
       },
     },
   },
+}).withTypeProvider<ZodTypeProvider>();
+
+server.register(fastifySwagger, {
+  openapi: {
+    info: {
+      title: "Desafio Node.js",
+      version: "1.0.0",
+    },
+  },
+  transform: jsonSchemaTransform,
 });
 
-const courses = [
-  { id: "1", title: "Curso de Node.js" },
-  { id: "2", title: "Curso de React" },
-  { id: "3", title: "Curso de React Native" },
-];
-
-server.get("/courses", (request, reply) => {
-  return reply.send({ courses });
-});
-
-server.get("/courses/:id", (request, reply) => {
-  type Params = {
-    id: string;
-  };
-
-  const params = request.params as Params;
-  const courseId = params.id;
-
-  const course = courses.find((course) => course.id === courseId);
-  if (course) {
-    return { course };
+server.register(scalarAPIReference, {
+  routePrefix: "/docs",
+  configuration: {
+    theme: 'kepler'
   }
-
-  return reply.status(404).send({ message: "Curso nao encontrado" });
 });
 
-server.post("/courses", (request, reply) => {
-  type Body = {
-    title: string;
-  };
+server.setValidatorCompiler(validatorCompiler);
+server.setSerializerCompiler(serializerCompiler);
 
-  const courseId = crypto.randomUUID();
-
-  const body = request.body as Body;
-  const courseTitle = body.title;
-
-  if (!courseTitle) {
-    return reply.status(400).send({ message: "Título do curso é obrigatório" });
-  }
-
-  courses.push({ id: courseId, title: courseTitle });
-
-  return reply.status(201).send({ courseId });
+// Rota raiz que redireciona para a documentação
+server.get("/", async (request, reply) => {
+  return reply.redirect("/docs");
 });
 
-server.listen({ port: 3333 }).then(() => {
-  console.log("HTTP server running!");
-});
+server.register(createCoursesRoute);
+server.register(getCoursesRoute);
+server.register(getCoursesByIdRoute);
+
+server.listen({ port: 3333 })
+  .then(() => {
+    console.log("HTTP server running!");
+  })
+  .catch((err) => {
+    server.log.error(err, "Failed to start server");
+    process.exit(1);
+  });
