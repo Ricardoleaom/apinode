@@ -4,11 +4,14 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "dev": "node --env-file .env --watch server.ts",
+    "dev": "node --env-file .env --watch src/server.ts",
+    "db:seed": "node --env-file .env src/database/seed.ts",
     "db:generate": "drizzle-kit generate",
     "db:migrate": "drizzle-kit migrate",
-    "studio": "dotenv -e .env -- drizzle-kit studio --host 0.0.0.0 --port 4985",
-    "open:studio": "open 'https://local.drizzle.studio/?host=sturdy-space-cod-wpqr5pgp6rr39q5q-4985.app.github.dev&port=443&secure=1'"
+    "studio": "dotenv -e .env -- drizzle-kit studio --verbose",
+    "db:push": "drizzle-kit push",
+    "pretest": "dotenv -e .env.test drizzle-kit migrate",
+    "test": "dotenv -e .env.test vitest run --coverage"
   },
   "repository": {
     "type": "git",
@@ -23,14 +26,21 @@
   "homepage": "https://github.com/Ricardoleaom/apinode#readme",
   "devDependencies": {
     "@types/node": "^24.3.0",
+    "@types/supertest": "^6.0.3",
+    "@vitest/coverage-v8": "^3.2.4",
     "dotenv": "^17.2.1",
+    "dotenv-cli": "^10.0.0",
     "drizzle-kit": "^0.31.4",
-    "typescript": "^5.9.2"
+    "supertest": "^7.1.4",
+    "typescript": "^5.9.2",
+    "vitest": "^3.2.4"
   },
   "dependencies": {
+    "@faker-js/faker": "^9.9.0",
     "@fastify/swagger": "^9.5.1",
     "@fastify/swagger-ui": "^5.2.3",
     "@scalar/fastify-api-reference": "^1.34.2",
+    "argon2": "^0.44.0",
     "drizzle-orm": "^0.44.4",
     "fastify": "^5.5.0",
     "fastify-type-provider-zod": "^5.0.3",
