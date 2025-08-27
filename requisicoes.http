@@ -2,13 +2,23 @@ POST http://localhost:3333/courses
 Content-Type: application/json
 
 {
-    "title": "Curso de Docker"
+    "title": "Curso de JavaScript"
 }
 
 ###
 
-GET http://localhost:3333/courses
+GET http://localhost:3333/courses?orderBy=title
 
 ###
 
-GET http://localhost:3333/courses/964c7b92-c755-4da1-9aa5-72d0d227c79f
+GET http://localhost:3333/courses/c5633c16-59ec-42e7-99b7-b02d8264056c
+
+###
+
+POST http://localhost:3333/sessions
+Content-Type: application/json
+
+{
+    "email": "MariaCecilia98@bol.com.br",
+    "password": "123456"
+}   

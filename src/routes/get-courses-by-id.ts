@@ -22,7 +22,9 @@ server.get(
             description: z.string().nullable(),
           }),
         }),
-        404: z.null().describe("Curso não encontrado"),
+        404: z.object({
+          error: z.string(),
+        }).describe("Curso não encontrado"),
       },
     },
   },
@@ -35,7 +37,7 @@ server.get(
       return { course: result[0] };
     }
 
-    return reply.status(404).send({ message: "Curso nao encontrado" });
+    return reply.status(404).send({ error: "Course not found" });
   }
 );
 };
