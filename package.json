@@ -1,11 +1,12 @@
 {
   "name": "apinode",
   "version": "1.0.0",
+  "type": "module",
   "description": "",
   "main": "index.js",
   "scripts": {
-    "dev": "node --env-file .env --watch src/server.ts",
-    "db:seed": "node --env-file .env src/database/seed.ts",
+    "dev": "dotenv -e .env -- tsx watch src/server.ts",
+    "db:seed": "dotenv -e .env -- node --loader ts-node/esm src/database/seed.ts",
     "db:generate": "drizzle-kit generate",
     "db:migrate": "drizzle-kit migrate",
     "studio": "dotenv -e .env -- drizzle-kit studio --verbose",
@@ -25,6 +26,7 @@
   },
   "homepage": "https://github.com/Ricardoleaom/apinode#readme",
   "devDependencies": {
+    "@types/jsonwebtoken": "^9.0.10",
     "@types/node": "^24.3.0",
     "@types/supertest": "^6.0.3",
     "@vitest/coverage-v8": "^3.2.4",
@@ -32,6 +34,9 @@
     "dotenv-cli": "^10.0.0",
     "drizzle-kit": "^0.31.4",
     "supertest": "^7.1.4",
+    "ts-node": "^10.9.2",
+    "ts-node-dev": "^2.0.0",
+    "tsx": "^4.20.5",
     "typescript": "^5.9.2",
     "vitest": "^3.2.4"
   },
@@ -44,6 +49,7 @@
     "drizzle-orm": "^0.44.4",
     "fastify": "^5.5.0",
     "fastify-type-provider-zod": "^5.0.3",
+    "jsonwebtoken": "^9.0.2",
     "pg": "^8.16.3",
     "pino-pretty": "^13.1.1",
     "zod": "^4.0.17"
