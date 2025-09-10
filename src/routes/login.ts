@@ -1,7 +1,7 @@
 import type { FastifyPluginAsyncZod } from "fastify-type-provider-zod";
 import { db } from "../database/client.ts";
 import { courses, users } from "../database/schema.ts";
-import { sign } from "jsonwebtoken";
+import jwt from "jsonwebtoken";
 import { eq } from "drizzle-orm";
 import { z } from "zod";
 import { verify } from "argon2";
@@ -53,7 +53,7 @@ export const loginRoute: FastifyPluginAsyncZod = async (server) => {
         throw new Error("JWT_SECRET is not set");
       }
 
-      const token = sign(
+      const token = jwt.sign(
         { sub: user.id, role: user.role },
         process.env.JWT_SECRET as string,
         {

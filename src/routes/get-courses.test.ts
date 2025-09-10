@@ -4,17 +4,20 @@ import { server } from "../app.ts";
 import { faker } from "@faker-js/faker";
 import { makeCourse } from "../tests/factories/make-course.ts";
 import { randomUUID } from "node:crypto";
+import { makeAuthenticatedUser } from "../tests/factories/make-user.ts";
 
 test("get course", async () => {
   await server.ready();
 
   const titleId = randomUUID();
 
+  const { token } = await makeAuthenticatedUser("instructor");
+
   const course = await makeCourse(titleId);
 
-  const response = await request(server.server).get(
-    `/courses?search=${titleId}`
-  );
+  const response = await request(server.server)
+    .get(`/courses?search=${titleId}`)
+    .set("Authorization", token);
 
   expect(response.status).toEqual(200);
   expect(response.body).toEqual({
@@ -32,9 +35,11 @@ test("get course", async () => {
 test("return 404 for non existing courses", async () => {
   await server.ready();
 
-  const response = await request(server.server).get(
-    `/courses/ecc165b9-7a0b-4a40-a2d0-a38670395034`
-  );
+  const { token } = await makeAuthenticatedUser("instructor");
+
+  const response = await request(server.server)
+    .get(`/courses/ecc165b9-7a0b-4a40-a2d0-a38670395034`)
+    .set("Authorization", token);
 
   expect(response.status).toEqual(404);
 });

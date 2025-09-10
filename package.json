@@ -12,7 +12,7 @@
     "studio": "dotenv -e .env -- drizzle-kit studio --verbose",
     "db:push": "drizzle-kit push",
     "pretest": "dotenv -e .env.test drizzle-kit migrate",
-    "test": "dotenv -e .env.test vitest run --coverage"
+    "test": "dotenv -e .env.test vitest run"
   },
   "repository": {
     "type": "git",

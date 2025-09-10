@@ -1,8 +1,9 @@
 POST http://localhost:3333/courses
 Content-Type: application/json
+Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI1YTkwMGM1Yy03ZTFmLTRlMDYtOGE4ZS0yMWE2MmY5OTBjZGMiLCJyb2xlIjoiaW5zdHJ1Y3RvciIsImlhdCI6MTc1NzM2MzMxMywiZXhwIjoxNzU3MzY2OTEzfQ.QrG9CNeoMHirR58NHXm4JZ13KpITb2hT_NF-Jk-6oxk
 
 {
-    "title": "Curso de JavaScript"
+    "title": "Curso de Node.js"
 }
 
 ###
@@ -11,7 +12,8 @@ GET http://localhost:3333/courses?orderBy=title
 
 ###
 
-GET http://localhost:3333/courses/c5633c16-59ec-42e7-99b7-b02d8264056c
+GET http://localhost:3333/courses/17dbfa12-84ba-4840-b31d-0314f628912b
+Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI1YTkwMGM1Yy03ZTFmLTRlMDYtOGE4ZS0yMWE2MmY5OTBjZGMiLCJyb2xlIjoic3R1ZGVudCIsImlhdCI6MTc1NzAwMjU2MywiZXhwIjoxNzU3MDA2MTYzfQ.c7PO21kD2WXMbuhdSP0R4wzHH8FTHqUUVF0vWrCPGHg
 
 ###
 
@@ -19,6 +21,6 @@ POST http://localhost:3333/sessions
 Content-Type: application/json
 
 {
-    "email": "MariaCecilia98@bol.com.br",
+    "email": "Marcelo.Braga31@gmail.com",
     "password": "123456"
 }
