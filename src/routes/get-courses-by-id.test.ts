@@ -1,41 +1,55 @@
-import { expect, test } from "vitest";
+import { beforeAll, describe, expect, test } from "vitest";
 import request from "supertest";
+import { randomUUID } from "node:crypto";
 import { server } from "../app.ts";
-import { faker } from "@faker-js/faker";
 import { makeCourse } from "../tests/factories/make-course.ts";
 import { makeAuthenticatedUser } from "../tests/factories/make-user.ts";
 
-test("get course by id", async () => {
+beforeAll(async () => {
   await server.ready();
-
-  const { token } = await makeAuthenticatedUser("student");
-  const course = await makeCourse();
-
-  const response = await request(server.server)
-    .get(`/courses/${course.id}`)
-    .set("Authorization", token);
-
-  expect(response.status).toEqual(200);
-  expect(response.body).toEqual({
-    course: {
-      id: expect.any(String),
-      title: expect.any(String),
-      description: null,
-    },
-  });
 });
 
-test("return 404 for non existing courses", async () => {
-  await server.ready();
+describe("GET /courses/:id", () => {
+  test("qualquer usuário autenticado vê o curso", async () => {
+    const { authorization } = await makeAuthenticatedUser("student");
+    const course = await makeCourse();
 
-  const { token } = await makeAuthenticatedUser("student");
+    const response = await request(server.server)
+      .get(`/courses/${course.id}`)
+      .set("Authorization", authorization);
 
-  const response = await request(server.server)
-    .get(`/courses/aebf5370-814b-11f0-b748-bb0670a41308`)
-    .set("Authorization", token);
+    expect(response.status).toEqual(200);
+    expect(response.body).toEqual({
+      course: { id: course.id, title: course.title, description: null },
+    });
+  });
 
-  expect(response.status).toEqual(404);
-  expect(response.body).toEqual({
-    error: "Course not found",
+  test("curso inexistente responde 404", async () => {
+    const { authorization } = await makeAuthenticatedUser("student");
+
+    const response = await request(server.server)
+      .get(`/courses/${randomUUID()}`)
+      .set("Authorization", authorization);
+
+    expect(response.status).toEqual(404);
+    expect(response.body).toEqual({ message: "Curso não encontrado." });
+  });
+
+  test("id fora do formato UUID responde 400", async () => {
+    const { authorization } = await makeAuthenticatedUser("student");
+
+    const response = await request(server.server)
+      .get("/courses/123")
+      .set("Authorization", authorization);
+
+    expect(response.status).toEqual(400);
+  });
+
+  test("sem token recebe 401", async () => {
+    const course = await makeCourse();
+
+    const response = await request(server.server).get(`/courses/${course.id}`);
+
+    expect(response.status).toEqual(401);
   });
 });

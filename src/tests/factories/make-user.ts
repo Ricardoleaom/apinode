@@ -1,36 +1,35 @@
 import { faker } from "@faker-js/faker";
+import { hash } from "argon2";
 import jwt from "jsonwebtoken";
+import { randomUUID } from "node:crypto";
 import { db } from "../../database/client.ts";
 import { users } from "../../database/schema.ts";
-import { hash } from "argon2";
-import { randomUUID } from "node:crypto";
+import { env } from "../../env.ts";
 
-export async function makeUser() {
+type Role = "student" | "instructor";
+
+export async function makeUser(role: Role = "student") {
   const passwordBeforeHash = randomUUID();
 
-  const result = await db
+  const [user] = await db
     .insert(users)
     .values({
       name: faker.person.fullName(),
-      email: faker.internet.email(),
+      email: `${randomUUID()}@example.com`,
       password: await hash(passwordBeforeHash),
+      role,
     })
     .returning();
 
-  return {
-    user: result[0],
-    passwordBeforeHash,
-  };
+  return { user, passwordBeforeHash };
 }
 
-export async function makeAuthenticatedUser(role: "instructor" | "student") {
+export async function makeAuthenticatedUser(role: Role) {
   const { user } = await makeUser(role);
 
-  if (!process.env.JWT_SECRET) {
-    throw new Error("JWT_SECRET is required.");
-  }
+  const token = jwt.sign({ sub: user.id, role: user.role }, env.JWT_SECRET, {
+    algorithm: "HS256",
+  });
 
-  const token = jwt.sign({ sub: user.id, role: role }, process.env.JWT_SECRET);
-
-  return { user, token };
+  return { user, authorization: `Bearer ${token}` };
 }
