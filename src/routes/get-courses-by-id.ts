@@ -1,19 +1,21 @@
 import type { FastifyPluginAsyncZod } from "fastify-type-provider-zod";
+import { eq } from "drizzle-orm";
+import { z } from "zod";
 import { db } from "../database/client.ts";
 import { courses } from "../database/schema.ts";
-import { z } from "zod";
-import { eq } from "drizzle-orm";
 import { checkRequestJWT } from "./hooks/check-request-jwt.ts";
-import { getAuthenticatedUserFromRequest } from "../utils/get-authenticated-user-from-request.ts";
 
 export const getCoursesByIdRoute: FastifyPluginAsyncZod = async (server) => {
   server.get(
     "/courses/:id",
     {
-      preHandler: [checkRequestJWT],
+      onRequest: [checkRequestJWT],
       schema: {
-        tags: ["Courses"],
+        tags: ["courses"],
         summary: "Get course by ID",
+        description:
+          "Busca um curso pelo ID. Aberto a qualquer usuário autenticado.",
+        security: [{ bearerAuth: [] }],
         params: z.object({
           id: z.uuid(),
         }),
@@ -26,30 +28,22 @@ export const getCoursesByIdRoute: FastifyPluginAsyncZod = async (server) => {
             }),
           }),
           404: z
-            .object({
-              error: z.string(),
-            })
+            .object({ message: z.string() })
             .describe("Curso não encontrado"),
         },
       },
     },
-    async (request: any, reply: any) => {
-      const user = getAuthenticatedUserFromRequest(request);
-
-      const courseId = request.params.id;
-
-      const result = await db
+    async (request, reply) => {
+      const [course] = await db
         .select()
         .from(courses)
-        .where(eq(courses.id, courseId));
+        .where(eq(courses.id, request.params.id));
 
-      if (result.length > 0) {
-        return { course: result[0] };
+      if (!course) {
+        return reply.status(404).send({ message: "Curso não encontrado." });
       }
 
-      return reply.status(404).send({ error: "Course not found" });
-    }
+      return reply.send({ course });
+    },
   );
 };
-
-export default getCoursesByIdRoute;

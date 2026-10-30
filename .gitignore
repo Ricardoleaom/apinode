@@ -1,1 +1,19 @@
+# dependências
 node_modules
+
+# testes
+coverage
+
+# variáveis de ambiente (o modelo fica em .env.example)
+.env
+.env.*
+!.env.example
+
+# logs
+*.log
+npm-debug.log*
+
+# editor e sistema
+.vscode
+.idea
+.DS_Store

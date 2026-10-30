@@ -1,7 +1,13 @@
 node_modules
-.git
-.env*
 coverage
+.git
+.github
+.vscode
+.env
+.env.*
+*.log
+*.md
+requisicoes.http
 vitest.config.ts
-requisicoes.hhtp
-README.md
+src/**/*.test.ts
+src/tests

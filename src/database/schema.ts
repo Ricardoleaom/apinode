@@ -30,5 +30,5 @@ export const enrollments = pgTable(
       .references(() => courses.id),
     createdAt: timestamp({ withTimezone: true }).notNull().defaultNow(),
   },
-  (table) => [uniqueIndex().on(table.userId, table.courseId)]
+  (table) => [uniqueIndex().on(table.userId, table.courseId)],
 );

@@ -1,10 +1,15 @@
 import type { FastifyPluginAsyncZod } from "fastify-type-provider-zod";
-import { db } from "../database/client.ts";
-import { courses, users } from "../database/schema.ts";
-import jwt from "jsonwebtoken";
 import { eq } from "drizzle-orm";
+import { hash, verify } from "argon2";
+import jwt from "jsonwebtoken";
 import { z } from "zod";
-import { verify } from "argon2";
+import { db } from "../database/client.ts";
+import { users } from "../database/schema.ts";
+import { env } from "../env.ts";
+
+// Hash usado quando o e-mail não existe: a verificação roda do mesmo jeito,
+// então o tempo de resposta não revela quais e-mails estão cadastrados.
+const dummyPasswordHash = hash("senha-de-referencia-para-timing");
 
 export const loginRoute: FastifyPluginAsyncZod = async (server) => {
   server.post(
@@ -14,7 +19,7 @@ export const loginRoute: FastifyPluginAsyncZod = async (server) => {
         tags: ["auth"],
         summary: "Login",
         description:
-          "Essa rota recebe um email e uma senha e cria uma sessão no banco de dados.",
+          "Recebe e-mail e senha e devolve um token JWT válido por 1 hora.",
         body: z.object({
           email: z.email(),
           password: z
@@ -23,45 +28,37 @@ export const loginRoute: FastifyPluginAsyncZod = async (server) => {
         }),
         response: {
           200: z.object({ token: z.string() }),
-          400: z.object({ message: z.string() }),
+          401: z
+            .object({ message: z.string() })
+            .describe("Credenciais inválidas"),
         },
       },
     },
     async (request, reply) => {
       const { email, password } = request.body;
 
-      // Aqui você deve implementar a lógica de autenticação, como verificar o email e a senha no banco de dados.
-
-      const result = await db
+      const [user] = await db
         .select()
         .from(users)
         .where(eq(users.email, email));
 
-      if (result.length === 0) {
-        return reply.status(400).send({ message: "Credencias Invalidas." });
-      }
+      const passwordHash = user?.password ?? (await dummyPasswordHash);
+      const doesPasswordMatch = await verify(passwordHash, password);
 
-      const user = result[0]; // Substitua por uma lógica real de geração de ID de sessão.
-
-      const doesPasswordMatch = await verify(user.password, password);
-
-      if (!doesPasswordMatch) {
-        return reply.status(400).send({ message: "Credenciais Inválidas." });
-      }
-
-      if (!process.env.JWT_SECRET) {
-        throw new Error("JWT_SECRET is not set");
+      if (!user || !doesPasswordMatch) {
+        return reply.status(401).send({ message: "Credenciais inválidas." });
       }
 
       const token = jwt.sign(
         { sub: user.id, role: user.role },
-        process.env.JWT_SECRET as string,
+        env.JWT_SECRET,
         {
+          algorithm: "HS256",
           expiresIn: "1h",
-        }
+        },
       );
 
       return reply.status(200).send({ token });
-    }
+    },
   );
 };

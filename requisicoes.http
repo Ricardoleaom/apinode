@@ -1,26 +1,40 @@
-POST http://localhost:3333/courses
+# Requisições de exemplo para a extensão REST Client do VS Code.
+# Rode `npm run db:seed` antes para criar os usuários de demonstração.
+
+@baseUrl = http://localhost:3333
+
+### Login como instrutor
+# @name login
+POST {{baseUrl}}/sessions
 Content-Type: application/json
-Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI1YTkwMGM1Yy03ZTFmLTRlMDYtOGE4ZS0yMWE2MmY5OTBjZGMiLCJyb2xlIjoiaW5zdHJ1Y3RvciIsImlhdCI6MTc1NzM2MzMxMywiZXhwIjoxNzU3MzY2OTEzfQ.QrG9CNeoMHirR58NHXm4JZ13KpITb2hT_NF-Jk-6oxk
 
 {
-    "title": "Curso de Node.js"
+  "email": "instrutor@exemplo.com",
+  "password": "123456"
 }
 
 ###
 
-GET http://localhost:3333/courses?orderBy=title
+@token = {{login.response.body.token}}
 
-###
-
-GET http://localhost:3333/courses/17dbfa12-84ba-4840-b31d-0314f628912b
-Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI1YTkwMGM1Yy03ZTFmLTRlMDYtOGE4ZS0yMWE2MmY5OTBjZGMiLCJyb2xlIjoic3R1ZGVudCIsImlhdCI6MTc1NzAwMjU2MywiZXhwIjoxNzU3MDA2MTYzfQ.c7PO21kD2WXMbuhdSP0R4wzHH8FTHqUUVF0vWrCPGHg
-
-###
-
-POST http://localhost:3333/sessions
+### Criar curso (instructor)
+# @name createCourse
+POST {{baseUrl}}/courses
+Authorization: Bearer {{token}}
 Content-Type: application/json
 
 {
-    "email": "Marcelo.Braga31@gmail.com",
-    "password": "123456"
+  "title": "Node.js com Fastify",
+  "description": "API REST com TypeScript, Drizzle e PostgreSQL"
 }
+
+### Listar cursos com busca, ordenação e paginação (instructor)
+GET {{baseUrl}}/courses?search=node&orderBy=title&page=1
+Authorization: Bearer {{token}}
+
+### Buscar curso por ID (qualquer usuário autenticado)
+GET {{baseUrl}}/courses/{{createCourse.response.body.courseId}}
+Authorization: Bearer {{token}}
+
+### Health check
+GET {{baseUrl}}/health

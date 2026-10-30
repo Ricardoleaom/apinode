@@ -1,18 +1,21 @@
 {
   "$schema": "https://json.schemastore.org/tsconfig",
-  "display": "Node 22",
-  "_version": "22.0.0",
-
   "compilerOptions": {
     "lib": ["es2024", "ESNext.Array", "ESNext.Collection", "ESNext.Iterator"],
     "module": "nodenext",
+    "moduleResolution": "nodenext",
     "target": "es2022",
-    "allowImportingTsExtensions": true,
     "noEmit": true,
+
+    // O Node executa os .ts direto (type stripping): só sintaxe apagável
+    // e imports de tipo explícitos.
+    "allowImportingTsExtensions": true,
+    "erasableSyntaxOnly": true,
+    "verbatimModuleSyntax": true,
 
     "strict": true,
     "esModuleInterop": true,
-    "skipLibCheck": true,
-    "moduleResolution": "node16"
-  }
+    "skipLibCheck": true
+  },
+  "exclude": ["node_modules", "coverage"]
 }
