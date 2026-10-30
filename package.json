@@ -1,49 +1,47 @@
 {
   "name": "apinode",
   "version": "1.0.0",
+  "private": true,
+  "description": "API REST de gerenciamento de cursos com Fastify, TypeScript, Drizzle ORM, PostgreSQL e autenticação JWT com controle de acesso por perfil.",
   "type": "module",
-  "description": "",
-  "main": "index.js",
+  "engines": {
+    "node": ">=22.18"
+  },
   "scripts": {
-    "dev": "dotenv -e .env -- tsx watch src/server.ts",
-    "db:seed": "dotenv -e .env -- node --loader ts-node/esm src/database/seed.ts",
+    "dev": "node --env-file=.env --watch src/server.ts",
+    "start": "node src/server.ts",
+    "typecheck": "tsc --noEmit",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:coverage": "vitest run --coverage",
     "db:generate": "drizzle-kit generate",
-    "db:migrate": "drizzle-kit migrate",
-    "studio": "dotenv -e .env -- drizzle-kit studio --verbose",
-    "db:push": "drizzle-kit push",
-    "pretest": "dotenv -e .env.test drizzle-kit migrate",
-    "test": "dotenv -e .env.test vitest run"
+    "db:migrate": "node --env-file-if-exists=.env src/database/migrate.ts",
+    "db:seed": "node --env-file-if-exists=.env src/database/seed.ts",
+    "db:studio": "drizzle-kit studio"
   },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/Ricardoleaom/apinode.git"
   },
-  "keywords": [],
-  "author": "",
+  "keywords": [
+    "fastify",
+    "typescript",
+    "drizzle",
+    "postgresql",
+    "jwt",
+    "rbac",
+    "vitest"
+  ],
+  "author": "Ricardo Leão",
   "license": "ISC",
   "bugs": {
     "url": "https://github.com/Ricardoleaom/apinode/issues"
   },
   "homepage": "https://github.com/Ricardoleaom/apinode#readme",
-  "devDependencies": {
-    "@types/jsonwebtoken": "^9.0.10",
-    "@types/node": "^24.3.0",
-    "@types/supertest": "^6.0.3",
-    "@vitest/coverage-v8": "^3.2.4",
-    "dotenv": "^17.2.1",
-    "dotenv-cli": "^10.0.0",
-    "drizzle-kit": "^0.31.4",
-    "supertest": "^7.1.4",
-    "ts-node": "^10.9.2",
-    "ts-node-dev": "^2.0.0",
-    "tsx": "^4.20.5",
-    "typescript": "^5.9.2",
-    "vitest": "^3.2.4"
-  },
   "dependencies": {
-    "@faker-js/faker": "^9.9.0",
     "@fastify/swagger": "^9.5.1",
-    "@fastify/swagger-ui": "^5.2.3",
     "@scalar/fastify-api-reference": "^1.34.2",
     "argon2": "^0.44.0",
     "drizzle-orm": "^0.44.4",
@@ -51,7 +49,20 @@
     "fastify-type-provider-zod": "^5.0.3",
     "jsonwebtoken": "^9.0.2",
     "pg": "^8.16.3",
-    "pino-pretty": "^13.1.1",
     "zod": "^4.0.17"
+  },
+  "devDependencies": {
+    "@faker-js/faker": "^9.9.0",
+    "@types/jsonwebtoken": "^9.0.10",
+    "@types/node": "^24.3.0",
+    "@types/supertest": "^6.0.3",
+    "@vitest/coverage-v8": "^3.2.4",
+    "dotenv": "^17.2.1",
+    "drizzle-kit": "^0.31.4",
+    "pino-pretty": "^13.2.0",
+    "prettier": "^3.9.10",
+    "supertest": "^7.1.4",
+    "typescript": "^5.9.2",
+    "vitest": "^3.2.4"
   }
 }
